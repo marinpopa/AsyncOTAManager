@@ -1,34 +1,44 @@
 # AsyncOTAManager 📡
 
-O bibliotecă Arduino pentru ESP32/ESP8266 care oferă o pagină web elegantă pentru actualizarea OTA (Over-The-Air) a firmware-ului și a sistemului de fișiere, cu autentificare și detectare automată.
+An Arduino library for ESP32/ESP8266 that provides an elegant web page for OTA (Over-The-Air) firmware and filesystem updates, with authentication and auto-detection.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Platform: ESP32/ESP8266](https://img.shields.io/badge/Platform-ESP32%2FESP8266-blue.svg)](https://www.arduino.cc/)
 
-## ✨ Caracteristici
+## ✨ Features
 
-- 🌐 **Pagină web OTA integrată** - interfață HTML comprimată (gzip)
-- 🔒 **Autentificare opțională** - protejează accesul la actualizări
-- 🔍 **Detectare automată** - recunoaște tipul de actualizare după extensie fișier
-- 📁 **Suport dual** - compatibil cu SPIFFS și LittleFS
-- 🔄 **Compatibilitate** - păstrează endpoint-urile vechi pentru backward compatibility
-- ⚡ **Performanță** - folosește ESPAsyncWebServer pentru conexiuni asincrone
+    🌐 Built-in OTA web page - compressed HTML interface (gzip)
 
-## 📦 Instalare
+    🔒 Optional authentication - protects update access
 
-### Prin Arduino IDE
-1. **Sketch** → **Include Library** → **Manage Libraries...**
-2. Caută "AsyncOTAManager"
-3. Click **Install**
+    🔍 Auto-detection - recognizes update type by file extension
 
-### Manual
-1. Descarcă ultima versiune [de aici](https://github.com/marinpopa/AsyncOTAManager/releases)
-2. Extrage în folderul `libraries` al Arduino IDE
-3. Repornește Arduino IDE
+    📁 Dual support - compatible with SPIFFS and LittleFS
 
-## 🚀 Utilizare rapidă
+    🔄 Backward compatibility - maintains old endpoints
 
-```cpp
+    ⚡ Performance - uses ESPAsyncWebServer for async connections
+
+## 📦 Installation
+Via Arduino IDE
+
+    Sketch → Include Library → Manage Libraries...
+
+    Search for "AsyncOTAManager"
+
+    Click Install
+
+### Manual Installation
+
+    Download the latest version from here
+
+    Extract to the Arduino IDE libraries folder
+
+    Restart Arduino IDE
+
+## 🚀 Quick Start
+cpp
+
 #include <WiFi.h>
 #include <AsyncOTAManager.h>
 
@@ -38,26 +48,27 @@ AsyncOTAManager otaManager(server);
 void setup() {
   Serial.begin(115200);
   
-  // Conectare la WiFi
-  WiFi.begin("SSID", "parola");
+  // Connect to WiFi
+  WiFi.begin("SSID", "password");
   while (WiFi.status() != WL_CONNECTED) {
     delay(500);
     Serial.print(".");
   }
   
-  Serial.println("\nConectat! IP: " + WiFi.localIP().toString());
+  Serial.println("\nConnected! IP: " + WiFi.localIP().toString());
   
-  // Configurare OTA
-  otaManager.setareAutentificare("admin", "parola123"); // Opțional
-  otaManager.activareDetectareAutomata(true); // Implicit activ
-  otaManager.begin("/ota");
+  // Configure OTA
+  otaManager.setAuthentication("admin", "password123"); // Optional
+  otaManager.enableAutoDetect(true); // Enabled by default
+  otaManager.begin("/update");
   
   server.begin();
 }
 
 void loop() {
-  // Codul tău principal
+  // Your main code
 }
+
 
 
 
