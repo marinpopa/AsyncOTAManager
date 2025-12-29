@@ -98,30 +98,31 @@ void enableAutoDetect(bool enable = true);
 
 ## 🌐 Available Endpoints
 
-Endpoint	Method	Description
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/ota` | GET | OTA web upload page (default path) |
+| `/update` | POST | Universal upload endpoint with auto-detection |
+| `/update-fw` | POST | Legacy firmware upload endpoint |
+| `/update-spiffs` | POST | Legacy SPIFFS upload endpoint |
+| `/update-littlefs` | POST | LittleFS upload endpoint |
 
-/ota	GET	OTA web upload page
+**Usage Examples:**
+- Access `http://[ESP_IP]/ota` in your browser to see the upload page
+- Send POST request to `http://[ESP_IP]/update` with your `.bin` file
+- For compatibility, you can still use `/update-fw` and `/update-spiffs`
 
-/update	POST	Universal upload with auto-detection
-
-/update-fw	POST	Firmware upload (legacy)
-
-/update-spiffs	POST	SPIFFS upload (legacy)
-
-/update-littlefs	POST	LittleFS upload
+**Authentication:** All endpoints support optional HTTP Basic Authentication when configured.
 
 ## 🧠 Auto-Detection
 
 ### The library automatically detects the update type based on file extension:
 
-File Extension	    Update Type
----
-.bin, .ino.bin    	Firmware
----
-.spiffs.bin         SPIFFS
----
-.littlefs.bin        LittleFS
----
+| File Extension      | Update Type |
+|:--------------------|:------------|
+| `.bin`, `.ino.bin`  | Firmware    |
+| `.spiffs.bin`       | SPIFFS      |
+| `.littlefs.bin`     | LittleFS    |
+
 ## 📝 Complete Example
 
 ```cpp
@@ -171,17 +172,17 @@ void loop() {
 
 ### Required Libraries
 
-    ESP Async WebServer
+ESP Async WebServer
 
-    AsyncTCP (ESP32)
+AsyncTCP (ESP32)
 
-    ESPAsyncTCP (ESP8266)
+ESPAsyncTCP (ESP8266)
 
 ### Supported Platforms
 
-    ESP32 (tested on ESP32 DevKit, NodeMCU-32S)
+ESP32 (tested on ESP32 DevKit, NodeMCU-32S)
 
-    ESP8266 (tested on NodeMCU, Wemos D1 Mini)
+ESP8266 (tested on NodeMCU, Wemos D1 Mini)
 
 ## 📁 Project Structure
 ```text
@@ -227,6 +228,7 @@ ESPAsyncWebServer for the async web server
 Arduino Core for ESP32/ESP8266 support
 
 ### Made with ❤️ for the Arduino community 🚀
+
 
 
 
