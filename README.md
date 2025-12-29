@@ -7,37 +7,28 @@ An Arduino library for ESP32/ESP8266 that provides an elegant web page for OTA (
 
 ## ✨ Features
 
-    🌐 Built-in OTA web page - compressed HTML interface (gzip)
-
-    🔒 Optional authentication - protects update access
-
-    🔍 Auto-detection - recognizes update type by file extension
-
-    📁 Dual support - compatible with SPIFFS and LittleFS
-
-    🔄 Backward compatibility - maintains old endpoints
-
-    ⚡ Performance - uses ESPAsyncWebServer for async connections
+🌐 Built-in OTA web page - compressed HTML interface (gzip)
+🔒 Optional authentication - protects update access
+🔍 Auto-detection - recognizes update type by file extension
+📁 Dual support - compatible with SPIFFS and LittleFS
+🔄 Backward compatibility - maintains old endpoints
+⚡ Performance - uses ESPAsyncWebServer for async connections
 
 ## 📦 Installation
 Via Arduino IDE
 
-    Sketch → Include Library → Manage Libraries...
-
-    Search for "AsyncOTAManager"
-
-    Click Install
+Sketch → Include Library → Manage Libraries...
+Search for "AsyncOTAManager"
+Click Install
 
 ### Manual Installation
 
-    Download the latest version from here
-
-    Extract to the Arduino IDE libraries folder
-
-    Restart Arduino IDE
+Download the latest version from here
+Extract to the Arduino IDE libraries folder
+Restart Arduino IDE
 
 ## 🚀 Quick Start
-cpp
+```cpp
 
 #include <WiFi.h>
 #include <AsyncOTAManager.h>
@@ -68,6 +59,7 @@ void setup() {
 void loop() {
   // Your main code
 }
+```
 
 
 
