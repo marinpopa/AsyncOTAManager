@@ -99,24 +99,29 @@ void enableAutoDetect(bool enable = true);
 ## 🌐 Available Endpoints
 
 Endpoint	Method	Description
+
 /ota	GET	OTA web upload page
+
 /update	POST	Universal upload with auto-detection
+
 /update-fw	POST	Firmware upload (legacy)
+
 /update-spiffs	POST	SPIFFS upload (legacy)
+
 /update-littlefs	POST	LittleFS upload
 
 ## 🧠 Auto-Detection
 
 ### The library automatically detects the update type based on file extension:
 
-File Extension	Update Type
-
-.bin, .ino.bin	Firmware
-
-.spiffs.bin	SPIFFS
-
-.littlefs.bin	LittleFS
-
+File Extension	    Update Type
+---
+.bin, .ino.bin    	Firmware
+---
+.spiffs.bin         SPIFFS
+---
+.littlefs.bin        LittleFS
+---
 ## 📝 Complete Example
 
 ```cpp
@@ -201,15 +206,15 @@ AsyncOTAManager/
 
 ### Contributions are welcome! To contribute:
 
-    Fork the repository
+Fork the repository
 
-    Create a new branch (git checkout -b feature/new)
+Create a new branch (git checkout -b feature/new)
 
-    Commit your changes (git commit -am 'Add feature X')
+Commit your changes (git commit -am 'Add feature X')
 
-    Push to the branch (git push origin feature/new)
+Push to the branch (git push origin feature/new)
 
-    Open a Pull Request
+Open a Pull Request
 
 ## 📄 License
 
@@ -217,11 +222,12 @@ AsyncOTAManager/
 
 ## 🙏 Acknowledgments
 
-    ESPAsyncWebServer for the async web server
+ESPAsyncWebServer for the async web server
 
-    Arduino Core for ESP32/ESP8266 support
+Arduino Core for ESP32/ESP8266 support
 
 ### Made with ❤️ for the Arduino community 🚀
+
 
 
 
