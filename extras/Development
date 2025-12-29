@@ -1,1 +1,12 @@
-
+ **Uncompressed HTML (Development Only)**
+ File: extras/AsyncOTAManager.cpp
+ Format: Plain (uncompressed) HTML
+ Purpose: UI customization and development
+ This file is not compiled by Arduino IDE and is provided only as a reference.
+ Using the Uncompressed Version
+ If you want to modify the HTML interface:
+ Copy:
+ extras/AsyncOTAManager.cpp
+ Replace:
+ src/AsyncOTAManager.cpp
+ Recompile the project
