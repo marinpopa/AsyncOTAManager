@@ -1,89 +1,110 @@
- #!/bin/bash
+#!/bin/bash
 
-# Oprește execuția dacă apar erori
-set -e
+# ============================================
+# Script: update_github_repo.sh
+# Actualizeaza un depozit GitHub
+# ============================================
 
-echo "========================================="
-echo "   🚀 GitHub Repository Update Manager   "
-echo "========================================="
+set -e  # opreste scriptul la prima eroare
 
-# 1. Solicitare detalii repository
-read -p "Introdu calea repoului (ex: marinpopa/AsyncOTAManager): " REPO_PATH
+# --- Culori pentru output ---
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+NC='\033[0m' # No Color
+
+echo -e "${YELLOW}=== Actualizare depozit GitHub ===${NC}"
+
+# --- 1. Cere calea catre repository (repo-ul local) ---
+# Daca nu se introduce nimic, foloseste directorul in care se afla scriptul
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+read -p "Introdu calea catre repository-ul local [default: ${SCRIPT_DIR}]: " REPO_PATH
+
 if [ -z "$REPO_PATH" ]; then
-    echo "❌ Eroare: Calea repository-ului nu poate fi goală!"
+    REPO_PATH="$SCRIPT_DIR"
+fi
+
+# Extinde ~ in $HOME
+REPO_PATH="${REPO_PATH/#\~/$HOME}"
+
+if [ ! -d "$REPO_PATH" ]; then
+    echo -e "${RED}Eroare: Directorul '$REPO_PATH' nu exista!${NC}"
     exit 1
 fi
 
-# 2. Solicitare versiune nouă
-read -p "Introdu noua versiune (ex: 1.0.5): " VERSION
-if [ -z "$VERSION" ]; then
-    echo "❌ Eroare: Versiunea nu poate fi goală!"
+cd "$REPO_PATH"
+echo -e "${GREEN}Director curent: $(pwd)${NC}"
+
+# --- 2. Cere URL-ul remote (owner/repo) ---
+read -p "Introdu owner/repo GitHub (ex: marinpopa/AsyncOTAManager): " REPO_SLUG
+if [ -z "$REPO_SLUG" ]; then
+    echo -e "${RED}Eroare: owner/repo nu poate fi gol!${NC}"
     exit 1
 fi
+REMOTE_URL="https://github.com/${REPO_SLUG}.git"
 
-# 3. Solicitare Personal Access Token (pentru securitate)
-read -sp "Introdu GitHub Personal Access Token (PAT): " TOKEN
-echo ""
-if [ -z "$TOKEN" ]; then
-    echo "❌ Eroare: Token-ul nu poate fi gol!"
-    exit 1
-fi
+# --- 3. Cere username si email pentru git config ---
+read -p "Introdu username GitHub: " GIT_USER
+read -p "Introdu email GitHub: " GIT_EMAIL
 
-# Extragere utilizator din path (tot ce e înainte de primul /)
-USER_NAME=$(echo "$REPO_PATH" | cut -d'/' -f1)
+# --- 4. Cere credentiale (username + parola/token) ---
+read -p "Introdu username-ul pentru autentificare GitHub: " AUTH_USER
+read -s -p "Introdu parola / token-ul GitHub: " AUTH_PASS
+echo
 
-echo -e "\n🔄 Se configurează conexiunea Git..."
-# Inițializare repo dacă nu există deja
-if [ ! -d ".git" ]; then
-    git init
-    git branch -m main
-else
-    # Curățare remote existent pentru a evita conflictele
-    git remote remove origin 2>/dev/null || true
-fi
+# --- 5. Construieste URL cu credentiale pentru push/pull ---
+CRED_URL="https://${AUTH_USER}:${AUTH_PASS}@github.com/${REPO_SLUG}.git"
 
-# Adăugare remote securizat cu Token inclus direct
-git remote add origin "https://${USER_NAME}:${TOKEN}@://github.com{REPO_PATH}.git"
+# --- 6. Init si configurare remote ---
+echo -e "${YELLOW}[1/9] git init${NC}"
+git init
 
-# Sincronizare inițială cu serverul (păstrează modificările locale prioritare)
-echo "📥 Se sincronizează cu istoricul de pe GitHub..."
-git pull origin main --allow-unrelated-histories || true
+echo -e "${YELLOW}[2/9] Eliminare remote origin existent${NC}"
+git remote remove origin 2>/dev/null || true
 
-# 4. Actualizare automată în library.properties
-FILE="library.properties"
-if [ -f "$FILE" ]; then
-    echo "📝 Se actualizează versiunea în $FILE la $VERSION..."
-    # Înlocuiește linia care începe cu version= cu noua valoare
-    sed -i "s/^version=.*/version=${VERSION}/" "$FILE"
-else
-    echo "⚠️ Avertisment: Nu s-a găsit fișierul $FILE. Se trece peste modificarea internă."
-fi
+echo -e "${YELLOW}[3/9] Adaugare remote origin: ${REMOTE_URL}${NC}"
+git remote add origin "$REMOTE_URL"
 
-# 5. Procesul de trimitere pe GitHub (Push)
-echo "📤 Se pregătesc fișierele pentru trimitere..."
+echo -e "${YELLOW}[4/9] Redenumire branch in 'main'${NC}"
+git branch -m main
+
+echo -e "${YELLOW}[5/9] Configurare user git${NC}"
+git config --global user.email "$GIT_EMAIL"
+git config --global user.name "$GIT_USER"
+
+# --- 7. Pull cu credentiale ---
+echo -e "${YELLOW}[6/9] Pull origin main${NC}"
+git -c credential.helper= \
+    -c "url.https://${AUTH_USER}:${AUTH_PASS}@github.com/.insteadOf=https://github.com/" \
+    pull origin main --allow-unrelated-histories || {
+        echo -e "${YELLOW}Pull a esuat sau nu exista branch remote. Continuam...${NC}"
+    }
+
+# --- 8. Add / status / commit / push ---
+echo -e "${YELLOW}[7/9] git add . && status && commit${NC}"
 git add .
+git status
+git commit -m "Update ota_html_gz.h with new web interface" || {
+    echo -e "${YELLOW}Nimic de commit (poate fi deja actualizat).${NC}"
+}
 
-# Verificăm dacă sunt modificări de trimis
-if git diff-index --quiet HEAD --; then
-    echo "ℹ️ Nu sunt modificări noi în fișiere."
-else
-    git commit -m "Update source files and bump version to ${VERSION}"
-    echo "🚀 Se încarcă codul pe GitHub..."
-    git push origin main
-fi
+echo -e "${YELLOW}[8/9] Push origin main${NC}"
+git push "$CRED_URL" main
 
-# 6. Creare și trimitere Tag (Versiune)
-echo "🏷️ Se creează tag-ul v${VERSION}..."
-# Șterge tag-ul local/remote dacă exista deja pentru a evita erori la re-run
-git tag -d "v${VERSION}" 2>/dev/null || true
-git push origin :refs/tags/v${VERSION} 2>/dev/null || true
+# --- 9. Commit + tag pentru library.properties ---
+echo -e "${YELLOW}[9/9] Actualizare library.properties + tag v1.0.5${NC}"
+git add library.properties
+git commit -m "Bump version to 1.0.5" || {
+    echo -e "${YELLOW}Nimic de commit pentru library.properties.${NC}"
+}
+git push "$CRED_URL" main
 
-# Generare tag nou
-git tag "v${VERSION}"
-git push origin "v${VERSION}"
+git tag v1.0.5 2>/dev/null || echo -e "${YELLOW}Tag v1.0.5 exista deja.${NC}"
+git push "$CRED_URL" v1.0.5
 
-echo "========================================="
-echo "🎉 Toate operațiunile s-au terminat cu succes!"
-echo "✨ Versiunea v${VERSION} este acum live pe GitHub!"
-echo "========================================="
+# --- Cleanup credentiale din remote ---
+echo -e "${YELLOW}Resetare remote la URL fara credentiale...${NC}"
+git remote set-url origin "$REMOTE_URL"
 
+echo -e "${GREEN}=== GATA! Depozit actualizat cu succes. ===${NC}"
